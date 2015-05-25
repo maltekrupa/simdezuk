@@ -1,6 +1,7 @@
 package main
 
 import (
+	"html/template"
 	"math/rand"
 	"net/http"
 	"time"
@@ -25,7 +26,7 @@ func rLon() float64 {
 	return rand.Float64()*(max-min) + min
 }
 
-func echoHandler(ws *websocket.Conn) {
+func randomHandler(ws *websocket.Conn) {
 	//loc := Location{`{"lat":"50.07", "lon":"8.14"}`}
 	// 50.119, 8.68211
 	// Left up: 50.175444, 8.525362
@@ -39,9 +40,16 @@ func echoHandler(ws *websocket.Conn) {
 	}
 }
 
+func tmplHandler(w http.ResponseWriter, r *http.Request) {
+	// parse templates
+	templates := template.Must(template.ParseGlob("templates/*.tmpl"))
+	templates.ExecuteTemplate(w, "indexPage", nil)
+}
+
 func main() {
-	http.Handle("/ws", websocket.Handler(echoHandler))
-	http.Handle("/", http.FileServer(http.Dir(".")))
+	http.Handle("/ws", websocket.Handler(randomHandler))
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	http.HandleFunc("/", tmplHandler)
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		panic("ListenAndServe: " + err.Error())
