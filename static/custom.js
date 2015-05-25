@@ -13,26 +13,21 @@ document.addEventListener("DOMContentLoaded", function(event) {
   }).addTo(map);
 
   var ws = new WebSocket("ws://localhost:8080/ws");
+  var polylines = [];
   
   ws.onmessage = function(e) {
-    console.log(e.data);
+    clearMap();
     var data = JSON.parse(e.data);
     realtime.update(data);
-    map.fitBounds(realtime.getBounds(), {maxZoom: 17});
+    var polyline = L.polyline(data.properties.history, {color: 'red', weight: 2}).addTo(map);
+    polylines.push(polyline);
+    map.fitBounds(realtime.getBounds(), {maxZoom: 18});
   }; 
 
-
-//   var popup = L.popup();
-//   
-//   function DisplayNewPosition(lat,lng) {     
-//       if (typeof marker != 'undefined') {
-//           map.removeLayer(marker);  // delete previous marker
-//           marker = L.marker([lat,lng]).addTo(map);  // add new marker
-//       }
-//       else {
-//           marker = L.marker([lat,lng]).addTo(map);  // add new marker
-//       }
-//   }
-//   
+  function clearMap() {
+    for(i = 0; i < polylines.length; i++) {
+        map.removeLayer(polylines[i]);
+    }
+  }
 
 });

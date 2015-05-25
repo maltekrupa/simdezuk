@@ -61,7 +61,7 @@ func (b *Boid) MoveToCoord(newPos gj.Coordinate) {
 
 func (b Boid) PrepareForFrontend() *gj.Feature {
 	// Create a GeoJSON feature for the frontend
-	props := map[string]interface{}{"id": b.Id}
+	props := map[string]interface{}{"id": b.Id, "history": b.history}
 	c := gj.Coordinate{b.Lon, b.Lat}
 	p := gj.NewPoint(c)
 	f := gj.NewFeature(p, props, nil)
